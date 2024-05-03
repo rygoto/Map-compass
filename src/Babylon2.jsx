@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Engine, Scene, ArcRotateCamera, HemisphericLight, Vector3, Mesh, MeshBuilder, ActionManager, ExecuteCodeAction, AxesViewer, WebXRState, WebXRDomOverlay, Texture, StandardMaterial, Space, Axis } from '@babylonjs/core';
+import { Engine, Scene, ArcRotateCamera, HemisphericLight, Vector3, Mesh, MeshBuilder, ActionManager, ExecuteCodeAction, AxesViewer, WebXRState, WebXRDomOverlay, Texture, StandardMaterial, Space, Axis, PointerEventTypes } from '@babylonjs/core';
 
-function BabylonScene() {
+function BabylonScene2() {
     const canvasRef = useRef(null);
 
 
@@ -121,9 +121,41 @@ function BabylonScene() {
                 },
             }).then((experience) => {
                 camera = experience.baseExperience.camera;  // XRカメラを使用
-                //sphere.position = camera.getFrontPosition(2);  // カメラの前方2mに配置
             });
             const axesViewer = new AxesViewer(scene);
+
+            //タッチによる方向と量の測定（試し）
+            let startPointerPosition = null;
+            let endPointerPosition = null;
+
+            scene.onPointerObservable.add((pointerInfo) => {
+                switch (pointerInfo.type) {
+                    case PointerEventTypes.POINTERDOWN:
+                        startPointerPosition = pointerInfo.pickInfo.pickedPoint.clone();
+                        break;
+                    case PointerEventTypes.POINTERMOVE:
+                        if (startPointerPosition) {
+                            let currentPointerPosition = pointerInfo.pickInfo.pickedPoint.clone();
+                            console.log("Moving at", currentPointerPosition);
+                        }
+                        break;
+                    case PointerEventTypes.POINTERUP:
+                        if (startPointerPosition) {
+                            endPointerPosition = pointerInfo.pickInfo.pickedPoint.clone();
+                            handlePointerMove(startPointerPosition, endPointerPosition);
+                            startPointerPosition = null;
+                        }
+                        break;
+                }
+            });
+
+            function handlePointerMove(start, end) {
+                let direction = end.subtract(start).normalize();
+                let distance = BABYLON.Vector3.Distance(start, end);
+                console.log("Direction:", direction, "Distance:", distance);
+            }
+            //ここまで
+
             engine.runRenderLoop(() => {
                 scene.render();
             });
@@ -141,4 +173,4 @@ function BabylonScene() {
     );
 }
 
-export default BabylonScene;
+export default BabylonScene2;
