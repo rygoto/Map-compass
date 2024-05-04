@@ -8,7 +8,7 @@ function BabylonScene3() {
     function createInvisibleGround(scene) {
         const ground = MeshBuilder.CreatePlane("invisibleGround", { size: 1000 }, scene); // 適当に大きなサイズを設定
         ground.position.y = 0;  // シーン内の適切な高さに設定
-        ground.position.z = 10;
+        ground.position.z = 20;
         ground.rotation.x = 0;//Math.PI / 2;  // X軸に沿って90度回転して地面と平行にする
 
         const material = new StandardMaterial("groundMaterial", scene);
@@ -41,7 +41,7 @@ function BabylonScene3() {
 
             cylinder.actionManager = new ActionManager(scene);
             cylinder.actionManager.registerAction(new ExecuteCodeAction(ActionManager.OnPickTrigger, () => {
-                cylinder.rotate(Axis.Y, Math.PI / 4, Space.LOCAL);
+                //cylinder.rotate(Axis.Y, Math.PI / 4, Space.LOCAL);
             }));
 
             const box = MeshBuilder.CreateBox("box", { width: 0.12, height: 0.3, depth: 0.12 }, scene);
@@ -143,26 +143,25 @@ function BabylonScene3() {
             const axesViewer = new AxesViewer(scene);
 
             //タッチによる方向と量の測定（試し）
-            let startPointerPosition = null;
-            let endPointerPosition = null;
+            let isTouchActive = false;
+            let currentPointerPosition = null;
+            let lastPointerPosition = null;
 
             scene.onPointerObservable.add((pointerInfo) => {
                 switch (pointerInfo.type) {
                     case PointerEventTypes.POINTERDOWN:
-                        startPointerPosition = pointerInfo.pickInfo.pickedPoint.clone();
+                        if (pointerInfo.pickInfo.pickedPoint) {
+                            isTouchActive = true;
+                            lastPointerPosition = pointerInfo.pickInfo.pickedPoint.clone();
+                        }
                         break;
                     case PointerEventTypes.POINTERMOVE:
-                        if (startPointerPosition) {
-                            let currentPointerPosition = pointerInfo.pickInfo.pickedPoint.clone();
-                            console.log("Moving at", currentPointerPosition);
+                        if (isTouchActive && pointerInfo.pickInfo.pickedPoint) {
+                            currentPointerPosition = pointerInfo.pickInfo.pickedPoint.clone();
                         }
                         break;
                     case PointerEventTypes.POINTERUP:
-                        if (startPointerPosition) {
-                            endPointerPosition = pointerInfo.pickInfo.pickedPoint.clone();
-                            handlePointerMove(startPointerPosition, endPointerPosition);
-                            startPointerPosition = null;
-                        }
+                        isTouchActive = false;
                         break;
                 }
             });
@@ -175,6 +174,12 @@ function BabylonScene3() {
             //ここまで
 
             engine.runRenderLoop(() => {
+                if (isTouchActive && lastPointerPosition && currentPointerPosition) {
+                    let direction = currentPointerPosition.subtract(lastPointerPosition);
+                    let rotationAmount = direction.x * 1; // スケールファクター調整
+                    cylinder.rotate(Axis.Y, rotationAmount, Space.LOCAL);
+                    lastPointerPosition = currentPointerPosition.clone(); // 次のフレームのために更新
+                }
                 scene.render();
             });
 
