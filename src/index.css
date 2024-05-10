@@ -18,6 +18,7 @@ a {
   color: #646cff;
   text-decoration: inherit;
 }
+
 a:hover {
   color: #535bf2;
 }
@@ -46,9 +47,11 @@ button {
   cursor: pointer;
   transition: border-color 0.25s;
 }
+
 button:hover {
   border-color: #646cff;
 }
+
 button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
@@ -59,10 +62,34 @@ button:focus-visible {
     color: #213547;
     background-color: #ffffff;
   }
+
   a:hover {
     color: #747bff;
   }
+
   button {
     background-color: #f9f9f9;
   }
+}
+
+/* index.css */
+.dom-overlay-container {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background-color: rgba(0, 0, 0, 0.7);
+  /* 半透明の背景色 */
+  color: white;
+  /* テキストの色 */
+  padding: 10px;
+  border-radius: 5px;
+  z-index: 1000;
+  /* オーバーレイが上に表示されるようにする */
+  display: none;
+  /* 最初は非表示にする */
+}
+
+.dom-overlay-slider {
+  width: 100%;
+  margin-top: 10px;
 }
