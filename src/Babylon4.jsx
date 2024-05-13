@@ -28,6 +28,8 @@ function BabylonScene4() {
     const [sliderValue, setSliderValue] = useState(1.5);
     const [texture, setTexture] = useState(null);
     const [noodleIcons, setNoodleIcons] = useState([]);
+    const [parkIcons, setParkIcons] = useState([]);
+    const [cafeIcons, setCafeIcons] = useState([]);
 
     //Create Invisible Ground for touch
     function createInvisibleGround(scene) {
@@ -88,22 +90,43 @@ function BabylonScene4() {
         }
     }, [sliderValue, texture]);
 
-    //NoodleIcons Controll
+    //Create icon contorll Effect
     useEffect(() => {
-        const radius = 1.0 / sliderValue;
-        const displayThreshold = 1.2;
+        const radius = sliderValue <= 1.2 ? 0.92 : 1.0 / sliderValue;
         const visiblityValue = sliderValue > 1 ? 1 : 0;
         noodleIcons.forEach((icon, index) => {
-
-            const angle = (Math.PI * 2 * index) / noodleIcons.length; // 配置する角度
-            const x = radius * Math.cos(angle);
-            const z = radius * Math.sin(angle);
-            const y = 0.035;
-            icon.position = new Vector3(x, y, z); // 新しい位置にアイコンを配置
+            const angle = ((Math.PI * 2 * index) / noodleIcons.length);// + Math.random();
+            icon.position.x = radius * Math.cos(angle);
+            icon.position.z = radius * Math.sin(angle);
+            icon.position.y = 0.035;
+            console.log("Radius", radius);
         });
     }, [sliderValue, noodleIcons]);
 
-    //General Controll
+    useEffect(() => {
+        const radius = sliderValue <= 1.2 ? 0.92 : 1.0 / sliderValue;
+        const visiblityValue = sliderValue > 1 ? 1 : 0;
+        parkIcons.forEach((icon, index) => {
+            const angle = ((Math.PI * 2 * index) / parkIcons.length) + 0.3;
+            icon.position.x = radius * Math.cos(angle);
+            icon.position.z = radius * Math.sin(angle);
+            icon.position.y = 0.035;
+            console.log("Radius", radius);
+        });
+    }, [sliderValue, parkIcons]);
+
+    useEffect(() => {
+        const radius = sliderValue <= 1.2 ? 0.92 : 1.0 / sliderValue;
+        const visiblityValue = sliderValue > 1 ? 1 : 0;
+        cafeIcons.forEach((icon, index) => {
+            const angle = ((Math.PI * 2 * index) / cafeIcons.length) + 0.6;
+            icon.position.x = radius * Math.cos(angle);
+            icon.position.z = radius * Math.sin(angle);
+            icon.position.y = 0.035;
+            console.log("Radius", radius);
+        });
+    }, [sliderValue, cafeIcons]);
+    //End of Create icon contorll Ef
     useEffect(() => {
         if (canvasRef.current) {
             const engine = new Engine(canvasRef.current, true);
@@ -129,6 +152,15 @@ function BabylonScene4() {
             cylinder.position.y = -1;
             cylinder.rotation.x = -Math.PI / 10;
             setTexture(textureInstance);
+            SceneLoader.ImportMeshAsync("", "/", "Compass.glb", scene)
+                .then((result) => {
+                    const compass = result.meshes[0];
+                    compass.position = new Vector3(0, 0.18, 0);
+                    let scaleValue = 0.8;
+                    compass.scaling = new Vector3(scaleValue, scaleValue, scaleValue);
+                    compass.rotation.x = -Math.PI / 10;
+                    compass.parent = cylinder;
+                });
             //End of Create Map Compass
 
             //Create Yajirushi
@@ -158,10 +190,6 @@ function BabylonScene4() {
                     noodleIcon.position = new Vector3(-0.4, -0.2, 1);
                     noodleIcon.scaling = new Vector3(0.2, 0.2, 0.2);
                     noodleIcon.rotation = new Vector3(0, -Math.PI / 2, 0);
-
-                    const newMaterial = new StandardMaterial("newMaterial", scene);
-                    newMaterial.diffuseColor = new Color3(0.8, 0.2, 0.2);
-                    noodleIcon.material = newMaterial;
                 });
 
             SceneLoader.ImportMeshAsync("", "/", "park.glb", scene)
@@ -212,7 +240,8 @@ function BabylonScene4() {
                     const newNoodleIcon = noodleIcon.clone("newNoodleIcon" + i);
                     newNoodleIcon.position = new Vector3(x, y, z);
                     newNoodleIcon.rotation = cylinder.rotation; // シリンダーの回転に合わせる
-                    newNoodleIcon.scaling = new Vector3(0.075, 0.075, 0.075);
+                    const scaleValue = 0.055;
+                    newNoodleIcon.scaling = new Vector3(scaleValue, scaleValue, scaleValue);
                     newNoodleIcon.parent = cylinder;
                     newNoodleIcon.rotate(Vector3.Up(), Math.PI / 2);
 
@@ -231,21 +260,6 @@ function BabylonScene4() {
                     sphereNoodleIcon.scaling = new Vector3(0.75, 0.75, 0.75);
                     sphereNoodleIcon.rotation = cylinder.rotation;
                     sphereNoodleIcon.parent = cylinder;
-
-                    /*const Text = MeshBuilder.CreateTextCreateText("myText", "HELLO WORLD", fontData, {
-                        size: 16,
-                        resolution: 64,
-                        depth: 10,
-                        faceUV: [
-                            new Vector4(0, 0, 1, 1),
-                            new Vector4(0, 0, 1, 1),
-                            new Vector4(0, 0, 1, 1),
-                        ],
-                    });
-                    Text.position = new Vector3(sphereX, sphereY - 1.0, sphereZ);*/
-                    //const textPlane = createTextPlane("TextPlane" + i, "テキスト " + (i + 1), "red  ", scene);
-                    //textPlane.position = new Vector3(sphereX, sphereY - 1.0, sphereZ);
-                    //textPlane.parent = sphereNoodleIcon;
                 }
                 setNoodleIcons(newNoodleIcons);
             }));
@@ -253,6 +267,7 @@ function BabylonScene4() {
             cone.actionManager = new ActionManager(scene);
             cone.actionManager.registerAction(new ExecuteCodeAction(ActionManager.OnPickTrigger, () => {
                 const numberOfBoxes = 3;
+                const newParkIcons = [];
                 for (let i = 0; i < numberOfBoxes; i++) {
                     const angle = Math.random() * Math.PI * 2; // Random angle
                     const radius = 0.70; // Half of the diameterTop
@@ -263,9 +278,12 @@ function BabylonScene4() {
                     const newParkIcon = parkIcon.clone("newParkIcon" + i);
                     newParkIcon.position = new Vector3(x, y, z);
                     newParkIcon.rotation = cylinder.rotation; // シリンダーの回転に合わせる
-                    newParkIcon.scaling = new Vector3(0.075, 0.075, 0.075);
+                    const scaleValue = 0.045;
+                    newParkIcon.scaling = new Vector3(scaleValue, 0.038, scaleValue);
                     newParkIcon.parent = cylinder;
                     newParkIcon.rotate(Vector3.Up(), Math.PI / 2);
+
+                    newParkIcons.push(newParkIcon);
 
                     const sphereRadius = 10;
                     const sphereX = sphereRadius * Math.cos(angle);
@@ -278,11 +296,13 @@ function BabylonScene4() {
                     sphereParkIcon.rotation = cylinder.rotation;
                     sphereParkIcon.parent = cylinder;
                 }
+                setParkIcons(newParkIcons);
             }));
 
             torus.actionManager = new ActionManager(scene);
             torus.actionManager.registerAction(new ExecuteCodeAction(ActionManager.OnPickTrigger, () => {
                 const numberOfBoxes = 3;
+                const newCafeIcons = [];
                 for (let i = 0; i < numberOfBoxes; i++) {
                     const angle = Math.random() * Math.PI * 2; // Random angle
                     const radius = 0.70; // Half of the diameterTop
@@ -293,9 +313,12 @@ function BabylonScene4() {
                     const newCafeIcon = cafeIcon.clone("newCafeIcon" + i);
                     newCafeIcon.position = new Vector3(x, y, z);
                     newCafeIcon.rotation = cylinder.rotation; // シリンダーの回転に合わせる
-                    newCafeIcon.scaling = new Vector3(0.075, 0.075, 0.075);
+                    const scaleValue = 0.055;
+                    newCafeIcon.scaling = new Vector3(scaleValue, scaleValue, scaleValue);
                     newCafeIcon.parent = cylinder;
                     newCafeIcon.rotate(Vector3.Up(), Math.PI / 2);
+
+                    newCafeIcons.push(newCafeIcon);
 
                     const sphereRadius = 10;
                     const sphereX = sphereRadius * Math.cos(angle);
@@ -308,6 +331,7 @@ function BabylonScene4() {
                     sphereCafeIcon.rotation = cylinder.rotation;
                     sphereCafeIcon.parent = cylinder;
                 }
+                setCafeIcons(newCafeIcons);
             }));
             //End of Create 3 IconsTouch excute
 
@@ -331,7 +355,7 @@ function BabylonScene4() {
                                 //overlayElement.textContent = 'うんこしてますかー'; // 例として文字を表示
                                 break;
                             default:
-                                overlayElement.style.display = 'none'; // 非表示にする
+                                overlayElement.style.display = 'none'; // 非表示にするnoneだった
                                 break;
                         }
                     }
@@ -394,8 +418,9 @@ function BabylonScene4() {
         <>
             <div
                 className="dom-overlay-container"
-                onTouchStart={preventTouchPropagation}
-                onPointerDown={preventTouchPropagation}
+                style={{ display: 'block' }}//通常モードのみARは使わない
+            //onTouchStart={preventTouchPropagation}
+            //onPointerDown={preventTouchPropagation}
             >
                 <label>Slider Value: {sliderValue}</label>
                 <input
