@@ -30,6 +30,11 @@ function BabylonScene4() {
     const [noodleIcons, setNoodleIcons] = useState([]);
     const [parkIcons, setParkIcons] = useState([]);
     const [cafeIcons, setCafeIcons] = useState([]);
+    const [noodleIconsData, setNoodleIconsData] = useState([
+        { radius: 0.7, angle: Math.PI * 2 },
+        { radius: 0.8, angle: Math.PI * 4 },
+        { radius: 0.4, angle: Math.PI * 1 / 4 }
+    ]);
 
     //Create Invisible Ground for touch
     function createInvisibleGround(scene) {
@@ -228,11 +233,24 @@ function BabylonScene4() {
             //Create 3 IconsTouch excute
             box.actionManager = new ActionManager(scene);
             box.actionManager.registerAction(new ExecuteCodeAction(ActionManager.OnPickTrigger, () => {
-                const numberOfBoxes = 3;
+                const numberOfBoxes = 5;
                 const newNoodleIcons = [];
-                for (let i = 0; i < numberOfBoxes; i++) {
+                noodleIconsData.forEach((data, index) => {
+                    const x = data.radius * Math.cos(data.angle);
+                    const z = data.radius * Math.sin(data.angle);
+                    const y = 0.035;
+
+                    const noodleIcon = MeshBuilder.CreateBox("noodleIcon" + index, { size: 0.1 }, scene); // Create a placeholder box for demo
+                    noodleIcon.position = new Vector3(x, y, z);
+                    noodleIcon.scaling = new Vector3(0.055, 0.055, 0.055); // Example scaling
+                    noodleIcon.parent = box; // Set parent if needed
+
+                    // Additional setup for noodleIcon can be added here
+                });
+                /*for (let i = 0; i < numberOfBoxes; i++) {
                     const angle = Math.random() * Math.PI * 2; // Random angle
-                    const radius = 0.7;
+                    //const radius = 0.7;
+                    const radius = 0.5 + Math.random() * 0.5;
                     const x = radius * Math.cos(angle);
                     const z = radius * Math.sin(angle);
                     const y = 0.035;
@@ -255,13 +273,13 @@ function BabylonScene4() {
                     /*const sphere = MeshBuilder.CreateSphere("sphere" + i, { diameter: 1 }, scene);
                     sphere.position = new Vector3(sphereX, sphereY, sphereZ);
                     sphere.parent = cylinder;*/
-                    const sphereNoodleIcon = noodleIcon.clone("sphereNoodleIcon" + i);
-                    sphereNoodleIcon.position = new Vector3(sphereX, sphereY, sphereZ);
-                    sphereNoodleIcon.scaling = new Vector3(0.75, 0.75, 0.75);
-                    sphereNoodleIcon.rotation = cylinder.rotation;
-                    sphereNoodleIcon.parent = cylinder;
-                }
-                setNoodleIcons(newNoodleIcons);
+                /*const sphereNoodleIcon = noodleIcon.clone("sphereNoodleIcon" + i);
+                sphereNoodleIcon.position = new Vector3(sphereX, sphereY, sphereZ);
+                sphereNoodleIcon.scaling = new Vector3(0.75, 0.75, 0.75);
+                sphereNoodleIcon.rotation = cylinder.rotation;
+                sphereNoodleIcon.parent = cylinder;
+            }
+                setNoodleIcons(newNoodleIcons);*/
             }));
 
             cone.actionManager = new ActionManager(scene);
