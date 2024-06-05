@@ -215,7 +215,35 @@ function BabylonScene5() {
                 });
             //End of Create Map Icons
 
-            const axesViewer = new AxesViewer(scene);
+            //Create XR experience
+            scene.createDefaultXRExperienceAsync({
+                uiOptions: {
+                    sessionMode: 'immersive-ar',
+                },
+            }).then(xrExperience => {
+                const featuresManager = xrExperience.baseExperience.featuresManager;
+                featuresManager.enableFeature(WebXRDomOverlay, "latest",
+                    { element: ".dom-overlay-container" }, undefined, false);
+
+                xrExperience.baseExperience.onStateChangedObservable.add((webXRState) => {
+                    const overlayElement = document.querySelector('.dom-overlay-container');
+                    if (overlayElement) {
+                        switch (webXRState) {
+                            case WebXRState.ENTERING_XR:
+                            case WebXRState.IN_XR:
+                                overlayElement.style.display = 'block'; // オーバーレイを表示
+                                //overlayElement.textContent = 'うんこしてますかー'; // 例として文字を表示
+                                break;
+                            default:
+                                overlayElement.style.display = 'none'; // 非表示にするnoneだった
+                                break;
+                        }
+                    }
+                });
+            });
+            //End of Create XR experience
+
+            // const axesViewer = new AxesViewer(scene);
 
             engine.runRenderLoop(() => {
                 scene.render();
