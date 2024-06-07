@@ -157,7 +157,7 @@ function BabylonScene4() {
             cylinder.position.y = -1;
             cylinder.rotation.x = -Math.PI / 10;
             setTexture(textureInstance);
-            SceneLoader.ImportMeshAsync("", "/", "Compass.glb", scene)
+            SceneLoader.ImportMeshAsync("", "/", "Compass5.glb", scene)
                 .then((result) => {
                     const compass = result.meshes[0];
                     compass.position = new Vector3(0, 0.18, 0);
@@ -440,7 +440,7 @@ function BabylonScene4() {
             //onTouchStart={preventTouchPropagation}
             //onPointerDown={preventTouchPropagation}
             >
-                <label>Slider Value: {sliderValue}</label>
+                <label>範囲 : {(sliderValue * 100).toFixed(2)}m</label>
                 <input
                     type="range"
                     min="0.3"

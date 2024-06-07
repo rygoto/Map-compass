@@ -6,6 +6,7 @@ import {
     HemisphericLight,
     Vector3,
     MeshBuilder,
+    Mesh,
     ActionManager,
     ExecuteCodeAction,
     AxesViewer,
@@ -21,9 +22,13 @@ import {
     DynamicTexture,
     Vector4,
     PBRMetallicRoughnessMaterial,
-    CubeTexture
+    CubeTexture,
+    Color4,
 } from '@babylonjs/core';
 import '@babylonjs/loaders';
+//import { AdvancedDynamicTexture, Control } from '@babylonjs/gui/2D';
+//import * as GUI from 'babylonjs-gui';
+import * as GUI from '@babylonjs/gui';
 
 function BabylonScene5() {
     const canvasRef = useRef(null);
@@ -72,8 +77,9 @@ function BabylonScene5() {
         }
     }, [sliderValue, unvisiblecylinder]);
 
-    function ClickIcon(clickedIcon, shopdata, compass, compass2, sliderValue) {
+    function ClickIcon(clickedIcon, shopdata, compass, compass2, sliderValue, scene) {
         const newIcons = [];
+        const guiTexture = GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI");
         shopdata.forEach((data, index) => {
             const angle = data.angle;
             const radius = data.radius;// * sliderValue;
@@ -97,6 +103,57 @@ function BabylonScene5() {
                 const icononWorldz = iconz * distancevalue;
                 icononWorld.position = new Vector3(icononWorldx, heightvalue, icononWorldz);
                 icononWorld.parent = compass;
+
+                //
+                const label = new GUI.TextBlock();
+                label.text = data.shopName;
+                label.color = "white";
+                label.fontSize = 24;
+                label.outlineWidth = 2;
+                label.outlineColor = "black";
+                label.textHorizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_CENTER;
+                label.textVerticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_TOP;
+
+                guiTexture.addControl(label); // GUIテクスチャにラベルを追加
+
+                // アイコンの位置に応じてGUI要素を更新
+                label.linkWithMesh(icononWorld);
+                label.linkOffsetY = 0.0; // テキストのメッシュからのオフセット
+                label.linkOffsetX = -10.0;
+                label.linkOffsetZ = 0.0;
+
+
+                //テキスト生成の試み集め
+                /*
+                const plane = Mesh.CreatePlane("textPlane" + index, 2, scene, false, Mesh.DOUBLESIDE);
+
+                plane.position = new Vector3(icononWorldx, heightvalue - 0.3, icononWorldz); // テキスト位置調整
+                plane.parent = compass;
+                //plane.position = new Vector3(0, 0, 0); // テキスト位置調整
+                //plane.parent = icononWorld;
+                const texture = new DynamicTexture("dynamic texture", 512, scene, true);
+                texture.hasAlpha = true;
+                const textureContext = texture.getContext();
+                textureContext.clearRect(0, 0, 512, 512);
+                textureContext.font = "bold 44px Arial";
+                textureContext.fillStyle = "white";
+                textureContext.textAlign = "center";
+                textureContext.fillText(data.shopName, 256, 256); // テキスト中央揃え
+                texture.update();
+
+                const material = new StandardMaterial("textMat" + index, scene);
+                material.emissiveTexture = texture;
+                material.useAlphaFromDiffuseTexture = true;
+                plane.material = material;
+
+                material.diffuseColor = new Color3(0, 0, 0);
+                material.specularColor = new Color3(0, 0, 0);
+                material.alpha = 0;
+                */
+                //End of テキスト生成の試み集め
+
+
+
             }
             newIcons.push(icononMap);
         });
@@ -110,19 +167,10 @@ function BabylonScene5() {
             const scene = new Scene(engine);
             const camera = new ArcRotateCamera("camera", Math.PI / 2, Math.PI / 2, 2, new Vector3(0, 0, 5), scene);
             camera.attachControl(canvasRef.current, true);
-            const light = new HemisphericLight("light", new Vector3(0, 1, 3), scene);
-            light.intensity = 10;
-
-            //Sky creation
-            /*var skybox = MeshBuilder.CreateBox("skyBox", { size: 1000.0 }, scene);
-            var skyboxMaterial = new StandardMaterial("skyBox", scene);
-            skyboxMaterial.backFaceCulling = false;
-            skyboxMaterial.reflectionTexture = new CubeTexture("https://playground.babylonjs.com/textures/skybox", scene);
-            skyboxMaterial.reflectionTexture.coordinatesMode = Texture.SKYBOX_MODE;
-            skyboxMaterial.diffuseColor = new Color3(0, 0, 0);
-            skyboxMaterial.specularColor = new Color3(0, 0, 0);
-            skybox.material = skyboxMaterial;*/
-            //End of sky creation
+            const light = new HemisphericLight("light", new Vector3(-0.5, 0, 4), scene);
+            light.intensity = 0.9;
+            const light2 = new HemisphericLight("light", new Vector3(0.5, 0, 4), scene);
+            light2.intensity = 0.9;
 
             //Create Map-Compass
             const cylinder = MeshBuilder.CreateCylinder("cylinder", { diameterTop: 1.85, diameterBottom: 1.85, height: 0.07 }, scene);
@@ -185,7 +233,7 @@ function BabylonScene5() {
             box1.visibility = 0;
             box1.actionManager = new ActionManager(scene);
             box1.actionManager.registerAction(new ExecuteCodeAction(ActionManager.OnPickTrigger, (evt) => {
-                ClickIcon(noodleIcon, noodleshopdata, cylinder, unvisibleCylinder, sliderValue);
+                ClickIcon(noodleIcon, noodleshopdata, cylinder, unvisibleCylinder, sliderValue, scene);
             }));
 
             SceneLoader.ImportMeshAsync("", "/", "park.glb", scene)
