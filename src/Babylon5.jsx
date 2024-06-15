@@ -108,9 +108,9 @@ function BabylonScene5() {
                 const icononWorldz = iconz * distancevalue;
                 icononWorld.position = new Vector3(icononWorldx, heightvalue, icononWorldz);
                 icononWorld.parent = compass;
-                //icononWorld.rotation = compass.rotation;
+                icononWorld.rotation = compass.rotation;
                 //試し
-                icononWorld.billboardMode = Mesh.BILLBOARDMODE_ALL;
+                //icononWorld.billboardMode = Mesh.BILLBOARDMODE_ALL;
 
                 const label = new GUI.TextBlock();
                 label.text = data.shopName;
