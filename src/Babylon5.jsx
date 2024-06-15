@@ -24,12 +24,14 @@ import {
     PBRMetallicRoughnessMaterial,
     CubeTexture,
     Color4,
-    Quaternion
+    Quaternion,
+    PBRMaterial
 } from '@babylonjs/core';
 import '@babylonjs/loaders';
 //import { AdvancedDynamicTexture, Control } from '@babylonjs/gui/2D';
 //import * as GUI from 'babylonjs-gui';
 import * as GUI from '@babylonjs/gui';
+import { noodleshopdata, parkdata, cafeData, conveniData } from './ShopData';
 
 function BabylonScene5() {
     const canvasRef = useRef(null);
@@ -106,6 +108,9 @@ function BabylonScene5() {
                 const icononWorldz = iconz * distancevalue;
                 icononWorld.position = new Vector3(icononWorldx, heightvalue, icononWorldz);
                 icononWorld.parent = compass;
+                //icononWorld.rotation = compass.rotation;
+                //試し
+                icononWorld.billboardMode = Mesh.BILLBOARDMODE_ALL;
 
                 const label = new GUI.TextBlock();
                 label.text = data.shopName;
@@ -122,6 +127,14 @@ function BabylonScene5() {
                 label.linkOffsetY = 30.0; // テキストのメッシュからのオフセット
                 label.linkOffsetX = 10.0;
                 label.linkOffsetZ = 0.0;
+
+                const label2 = new GUI.TextBlock();
+                label2.text = data.shopDistance;
+                label2.color = "white";
+
+                guiTexture.addControl(label2);
+                label2.linkWithMesh(icononWorld);
+                label2.linkOffsetY = 55.0;
             }
             newIcons.push(icononMap);
         });
@@ -172,6 +185,33 @@ function BabylonScene5() {
             unvisibleCylinder.parent = cylinder;
             setUnvisibleCylinder(unvisibleCylinder);
             //End of Create Map Compass
+            const glassCircle = MeshBuilder.CreateCylinder("circle", { diameterTop: 1.85, diameterBottom: 1.85, height: 0.01 }, scene);
+            glassCircle.position.z = 3;
+            glassCircle.position.y = -0.9;
+            glassCircle.rotation.x = -Math.PI / 10;
+            const glass = new PBRMaterial("glass", scene);
+            glass.indexOfRefraction = 0.52;
+            glass.alpha = 0.3;
+            glass.directIntensity = 0.0;
+            glass.environmentIntensity = 0.5;
+            glass.cameraExposure = 0.66;
+            glass.cameraContrast = 1.66;
+            glass.microSurface = 1.0;
+            glass.reflectivityColor = new Color3(0.2, 0.2, 0.2);
+            glass.albedoColor = new Color3(0.85, 0.85, 0.85);
+            glassCircle.material = glass;
+            //glassCircle.parent = cylinder;
+            //glassCircle.visibility = 0.0;
+            SceneLoader.ImportMeshAsync("", "/", "yajirusi.glb", scene)
+                .then((result) => {
+                    // 読み込んだメッシュの最初の要素に対して位置とスケールを設定
+                    const yajirushioncompass = result.meshes[0];
+                    yajirushioncompass.position = new Vector3(0, 0.17, 0.8);
+                    yajirushioncompass.scaling = new Vector3(0.16, 0.1, 0.1);
+                    yajirushioncompass.rotation = new Vector3(0, Math.PI, 0);
+                    yajirushioncompass.parent = cylinder;
+                });
+
 
             //Create Map Icons
             let noodleIcon = null;
@@ -179,36 +219,12 @@ function BabylonScene5() {
             let cafeIcon = null;
             let conveniIcon = null;
             const for4verscale = 3 / 4;
-            const noodleshopdata = [
-                { radius: 0.5, angle: 0, shopName: "俺系塩ラーメン" },
-                { radius: 0.2, angle: Math.PI / 2, shopName: "麺の先へ" },
-                { radius: 0.4, angle: Math.PI, shopName: "Afuri" },
-                { radius: 0.8, angle: Math.PI * 3 / 2, shopName: "はやし田" }
-            ];
-            const parkdata = [
-                { radius: 0.3, angle: 0, shopName: "筑紫の森公園" },
-                { radius: 0.4, angle: Math.PI / 5, shopName: "林試の森公園" },
-                { radius: 0.8, angle: Math.PI, shopName: "上野公園" },
-                { radius: 0.4, angle: -Math.PI * 3 / 2, shopName: "NoNo青山" }
-            ];
-            const cafeData = [
-                { radius: 0.6, angle: 0, shopName: "スターバックス" },
-                { radius: 0.2, angle: -Math.PI / 2, shopName: "タリーズ" },
-                { radius: 0.7, angle: -Math.PI / 3, shopName: "ドトール" },
-                { radius: 0.3, angle: -Math.PI * 7 / 2, shopName: "カフェベローチェ" },
-                { radius: 0.6, angle: -Math.PI / 9, shopName: "コメダ珈琲" }
-            ];
-            const conveniData = [
-                { radius: 0.1, angle: -Math.PI / 7, shopName: "セブンイレブン" },
-                { radius: 0.2, angle: Math.PI / 2, shopName: "ローソン" },
-                { radius: 0.7, angle: Math.PI / 3, shopName: "ファミリーマート" },
-            ];
             SceneLoader.ImportMeshAsync("", "/", "noodle.glb", scene)
                 .then((result) => {
                     // 読み込んだメッシュの最初の要素に対して位置とスケールを設定
                     noodleIcon = result.meshes[0];
                     noodleIcon.position = new Vector3(-0.4, -0.2, 1);
-                    noodleIcon.scaling = new Vector3(0.12, 0.12, 0.12);
+                    noodleIcon.scaling = new Vector3(0.08, 0.08, 0.08);
                     noodleIcon.rotation = new Vector3(0, -Math.PI / 2, 0);
                 });
 
@@ -225,7 +241,7 @@ function BabylonScene5() {
                     // 読み込んだメッシュの最初の要素に対して位置とスケールを設定
                     parkIcon = result.meshes[0];
                     parkIcon.position = new Vector3(-0.1, -0.2, 1);
-                    parkIcon.scaling = new Vector3(0.08, 0.08, 0.08);
+                    parkIcon.scaling = new Vector3(0.06, 0.06, 0.06);
                     parkIcon.rotation = new Vector3(0, -Math.PI / 2, 0);
                 });
 
@@ -242,7 +258,7 @@ function BabylonScene5() {
                     // 読み込んだメッシュの最初の要素に対して位置とスケールを設定
                     cafeIcon = result.meshes[0];
                     cafeIcon.position = new Vector3(0.2, -0.2, 1);
-                    cafeIcon.scaling = new Vector3(0.08, 0.08, 0.08);
+                    cafeIcon.scaling = new Vector3(0.06, 0.06, 0.06);
                     cafeIcon.rotation = new Vector3(0, -Math.PI / 2, 0);
                 });
 
@@ -259,7 +275,7 @@ function BabylonScene5() {
                     // 読み込んだメッシュの最初の要素に対して位置とスケールを設定
                     conveniIcon = result.meshes[0];
                     conveniIcon.position = new Vector3(0.47, -0.2, 1);
-                    conveniIcon.scaling = new Vector3(0.08, 0.08, -0.08);
+                    conveniIcon.scaling = new Vector3(0.06, 0.06, -0.06);
                     conveniIcon.rotation = new Vector3(0, Math.PI / 2, 0);
                 });
             const box4 = MeshBuilder.CreateBox("box", { width: 0.3, height: 0.3, depth: 0.3 }, scene);
