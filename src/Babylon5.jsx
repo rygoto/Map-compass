@@ -25,7 +25,11 @@ import {
     CubeTexture,
     Color4,
     Quaternion,
-    PBRMaterial
+    PBRMaterial,
+    Matrix,
+    Animation,
+    QuadraticEase,
+    EasingFunction
 } from '@babylonjs/core';
 import '@babylonjs/loaders';
 //import { AdvancedDynamicTexture, Control } from '@babylonjs/gui/2D';
@@ -148,8 +152,8 @@ function BabylonScene5() {
             const scene = new Scene(engine);
             const camera = new ArcRotateCamera("camera", Math.PI / 2, Math.PI / 2, 2, new Vector3(0, 0, 5), scene);
             camera.attachControl(canvasRef.current, true);
-            const light = new HemisphericLight("light", new Vector3(-0.5, 0, 4), scene);
-            light.intensity = 0.9;
+            const light = new HemisphericLight("light", new Vector3(2, 5, 3), scene);
+            light.intensity = 2;
             const light2 = new HemisphericLight("light", new Vector3(0.5, 0, 4), scene);
             light2.intensity = 0.9;
             const light3 = new HemisphericLight("light", new Vector3(-3, 0, 0), scene);
@@ -211,6 +215,93 @@ function BabylonScene5() {
                     yajirushioncompass.rotation = new Vector3(0, Math.PI, 0);
                     yajirushioncompass.parent = cylinder;
                 });
+            const cylinderForRotation = MeshBuilder.CreateCylinder("cylinder", { diameterTop: 0.05, diameterBottom: 0.05, height: 0.7 }, scene);
+            cylinderForRotation.position = new Vector3(0, -0.58, 3.9);
+            cylinderForRotation.rotation = new Vector3(Math.PI / 10, Math.PI, Math.PI / 2);//from Math.PI / 10 to -Math.PI * 8 / 7
+            cylinderForRotation.visibility = 0;
+            SceneLoader.ImportMeshAsync("", "/", "Compass-Cover3.glb", scene)
+                .then((result) => {
+                    const cover = result.meshes[0];
+                    cover.position = new Vector3(0, 0, 1);
+                    let scaleValue = 0.8;
+                    cover.scaling = new Vector3(scaleValue, scaleValue, scaleValue);
+
+                    cover.rotation = new Vector3(0, Math.PI, Math.PI / 2);
+                    cover.parent = cylinderForRotation;
+
+                    const metalicMaterial = new PBRMetallicRoughnessMaterial("metal", scene);
+                    metalicMaterial.baseColor = new Color3(0.9, 0.9, 0.5);
+                    metalicMaterial.metallic = 0.5;
+                    metalicMaterial.roughness = 0.5;
+                    cover.material = metalicMaterial;
+
+                });
+            /*const rotationAnimation = new Animation("rotationAnimation", "rotation.x", 30, Animation.ANIMATIONTYPE_FLOAT, Animation.ANIMATIONLOOPMODE_CYCLE);
+            const keys = [];
+            keys.push({ frame: 0, value: Math.PI / 10 });
+            keys.push({ frame: 100, value: -Math.PI * 8 / 7 });
+            rotationAnimation.setKeys(keys);
+            cylinderForRotation.animations.push(rotationAnimation);*/
+
+            const cylinderForClick = MeshBuilder.CreateCylinder("cylinder", { diameterTop: 2, diameterBottom: 2, height: 0.1 }, scene);
+            cylinderForClick.position.z = 3;
+            cylinderForClick.position.y = -0.83;
+            cylinderForClick.rotation.x = -Math.PI / 10;
+            cylinderForClick.visibility = 0;
+            //cylinderForClick.parent = cylinderForRotation;
+            cylinderForClick.actionManager = new ActionManager(scene);
+            cylinderForClick.actionManager.registerAction(new ExecuteCodeAction(ActionManager.OnPickTrigger,
+
+                function () {
+                    // アニメーションの作成
+                    const frameRate = 30;
+                    const animationDuration = 1; // 秒単位
+
+                    const rotationAnimation = new Animation(
+                        "rotationAnimation",
+                        "rotation.x",
+                        frameRate,
+                        Animation.ANIMATIONTYPE_FLOAT,
+                        Animation.ANIMATIONLOOPMODE_CONSTANT
+                    );
+
+                    const keyFrames = [];
+                    keyFrames.push({
+                        frame: 0,
+                        value: 0
+                    });
+                    keyFrames.push({
+                        frame: frameRate * animationDuration,
+                        value: -Math.PI * 8 / 7
+                    });
+
+                    rotationAnimation.setKeys(keyFrames);
+
+                    // イージング関数を追加（オプション）
+                    const easingFunction = new QuadraticEase();
+                    easingFunction.setEasingMode(EasingFunction.EASINGMODE_EASEOUT);
+                    rotationAnimation.setEasingFunction(easingFunction);
+
+                    // アニメーションの開始
+                    scene.beginDirectAnimation(cylinderForRotation, [rotationAnimation], 0, frameRate * animationDuration, false);
+                }
+            ));
+
+            SceneLoader.ImportMeshAsync("", "/", "Compass-Deco.glb", scene)
+                .then((result) => {
+                    const cover = result.meshes[0];
+                    cover.position = new Vector3(0, -0.85, 2.95);
+                    let scaleValue = 0.8;
+                    cover.scaling = new Vector3(scaleValue, scaleValue, scaleValue);
+
+                    cover.rotation = new Vector3(-Math.PI / 10, 0, 0);
+
+                    const metalicMaterial = new PBRMetallicRoughnessMaterial("metal", scene);
+                    metalicMaterial.baseColor = new Color3(0.9, 0.9, 0.5);
+                    metalicMaterial.metallic = 0.5;
+                    metalicMaterial.roughness = 0.5;
+                });
+
 
 
             //Create Map Icons
@@ -392,7 +483,7 @@ function BabylonScene5() {
                     onChange={handleSliderChange}
                 ></input>
             </div>*/}
-            <canvas ref={canvasRef} style={{ width: '100vh', height: '100vh' }} />
+            < canvas ref={canvasRef} style={{ width: '100vh', height: '100vh' }} />
         </>
     );
 }
