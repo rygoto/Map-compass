@@ -29,7 +29,8 @@ import {
     Matrix,
     Animation,
     QuadraticEase,
-    EasingFunction
+    EasingFunction,
+    TransformNode
 } from '@babylonjs/core';
 import '@babylonjs/loaders';
 //import { AdvancedDynamicTexture, Control } from '@babylonjs/gui/2D';
@@ -37,7 +38,7 @@ import '@babylonjs/loaders';
 import * as GUI from '@babylonjs/gui';
 import { noodleshopdata, parkdata, cafeData, conveniData } from './ShopData';
 
-function BabylonScene5() {
+function BabylonScene6() {
     const canvasRef = useRef(null);
     const [sliderValue, setSliderValue] = useState(1.5);
     const [texture, setTexture] = useState(null);
@@ -160,6 +161,7 @@ function BabylonScene5() {
             light3.intensity = 0.9;
 
             //Create Map-Compass
+            const compassParent = new TransformNode("compassParent", scene);
             const cylinder = MeshBuilder.CreateCylinder("cylinder", { diameterTop: 1.85, diameterBottom: 1.85, height: 0.07 }, scene);
             const textureInstance = new Texture('map2.png');
             const material = new StandardMaterial("material", scene);
@@ -171,6 +173,7 @@ function BabylonScene5() {
             cylinder.position.z = 3;
             cylinder.position.y = -1;
             cylinder.rotation.x = -Math.PI / 10;
+            cylinder.parent = compassParent;//
             setTexture(textureInstance);
             SceneLoader.ImportMeshAsync("", "/", "Compass5.glb", scene)
                 .then((result) => {
@@ -207,13 +210,14 @@ function BabylonScene5() {
             glass.reflectivityColor = new Color3(0.2, 0.2, 0.2);
             glass.albedoColor = new Color3(0.85, 0.85, 0.85);
             glassCircle.material = glass;
+            glassCircle.parent = compassParent;
             //glassCircle.parent = cylinder;
             //glassCircle.visibility = 0.0;
             SceneLoader.ImportMeshAsync("", "/", "yajirusi.glb", scene)
                 .then((result) => {
                     // 読み込んだメッシュの最初の要素に対して位置とスケールを設定
                     const yajirushioncompass = result.meshes[0];
-                    yajirushioncompass.position = new Vector3(0, 0.17, 0.8);
+                    yajirushioncompass.position = new Vector3(0, 0.17, 0.6);
                     yajirushioncompass.scaling = new Vector3(0.16, 0.1, 0.1);
                     yajirushioncompass.rotation = new Vector3(0, Math.PI, 0);
                     yajirushioncompass.parent = cylinder;
@@ -222,6 +226,7 @@ function BabylonScene5() {
             cylinderForRotation.position = new Vector3(0, -0.58, 3.9);
             cylinderForRotation.rotation = new Vector3(Math.PI / 10, Math.PI, Math.PI / 2);//from Math.PI / 10 to -Math.PI * 8 / 7
             cylinderForRotation.visibility = 0;
+            cylinderForRotation.parent = compassParent;
             SceneLoader.ImportMeshAsync("", "/", "Compass-Cover3.glb", scene)
                 .then((result) => {
                     const cover = result.meshes[0];
@@ -246,6 +251,7 @@ function BabylonScene5() {
             cylinderForClick.rotation = new Vector3(-Math.PI / 10, 0, Math.PI / 2);
             cylinderForClick.visibility = 0;
             //cylinderForClick.parent = cylinderForRotation;
+            let isReversed = false;
             cylinderForClick.actionManager = new ActionManager(scene);
             cylinderForClick.actionManager.registerAction(new ExecuteCodeAction(ActionManager.OnPickTrigger,
 
@@ -262,14 +268,17 @@ function BabylonScene5() {
                         Animation.ANIMATIONLOOPMODE_CONSTANT
                     );
 
+                    const startValue = isReversed ? -Math.PI * 8 / 7 : 0;
+                    const endValue = isReversed ? Math.PI / 10 : -Math.PI * 8 / 7;
+
                     const keyFrames = [];
                     keyFrames.push({
                         frame: 0,
-                        value: 0
+                        value: startValue
                     });
                     keyFrames.push({
                         frame: frameRate * animationDuration,
-                        value: -Math.PI * 8 / 7
+                        value: endValue
                     });
 
                     rotationAnimation.setKeys(keyFrames);
@@ -281,6 +290,7 @@ function BabylonScene5() {
 
                     // アニメーションの開始
                     scene.beginDirectAnimation(cylinderForRotation, [rotationAnimation], 0, frameRate * animationDuration, false);
+                    isReversed = !isReversed
                 }
             ));
 
@@ -297,8 +307,11 @@ function BabylonScene5() {
                     metalicMaterial.baseColor = new Color3(0.9, 0.9, 0.5);
                     metalicMaterial.metallic = 0.5;
                     metalicMaterial.roughness = 0.5;
+                    cover.parent = compassParent;
                 });
-
+            const compassScale = 0.8;
+            compassParent.scaling = new Vector3(compassScale, compassScale, compassScale);
+            //End of Create Compass
 
 
             //Create Map Icons
@@ -486,4 +499,4 @@ function BabylonScene5() {
 }
 
 
-export default BabylonScene5;
+export default BabylonScene6;
