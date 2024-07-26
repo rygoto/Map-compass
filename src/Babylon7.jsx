@@ -372,13 +372,13 @@ function BabylonScene7() {
                 .then((result) => {
                     // 読み込んだメッシュの最初の要素に対して位置とスケールを設定
                     noodleIcon = result.meshes[0];
-                    noodleIcon.position = new Vector3(-0.4, -0.2, 0.8);
+                    noodleIcon.position = new Vector3(0.2, -0.2, 0.8);
                     noodleIcon.scaling = new Vector3(0.08, 0.08, 0.08);
                     noodleIcon.rotation = new Vector3(0, -Math.PI / 2, 0);
                 });
 
             const box1 = MeshBuilder.CreateBox("box", { width: 0.3, height: 0.3, depth: 0.3 }, scene);
-            box1.position = new Vector3(-0.4, 0, 0.8); // 位置設定を修正
+            box1.position = new Vector3(0.2, 0, 0.8); // 位置設定を修正
             box1.scaling = new Vector3(0.5, 0.5, 0.5);
             box1.visibility = 0;
             box1.actionManager = new ActionManager(scene);
@@ -392,7 +392,7 @@ function BabylonScene7() {
             label.color = "white";
             guiTexture.addControl(label);
             label.linkWithMesh(box1);
-            label.linkOffsetY = 90.0;
+            label.linkOffsetY = 150.0;
             label.fontSize = 42;
 
             SceneLoader.ImportMeshAsync("", "/", "park.glb", scene)
@@ -424,13 +424,13 @@ function BabylonScene7() {
                 .then((result) => {
                     // 読み込んだメッシュの最初の要素に対して位置とスケールを設定
                     cafeIcon = result.meshes[0];
-                    cafeIcon.position = new Vector3(0.2, -0.2, 0.8);
+                    cafeIcon.position = new Vector3(-0.4, -0.2, 0.8);
                     cafeIcon.scaling = new Vector3(0.06, 0.06, 0.06);
                     cafeIcon.rotation = new Vector3(0, -Math.PI / 2, 0);
                 });
 
             const box3 = MeshBuilder.CreateBox("box", { width: 0.3, height: 0.3, depth: 0.3 }, scene);
-            box3.position = new Vector3(0.2, 0, 0.8); // 位置設定を修正
+            box3.position = new Vector3(-0.4, 0, 0.8); // 位置設定を修正
             box3.scaling = new Vector3(0.5, 0.5, 0.5);
             box3.visibility = 0;
             box3.actionManager = new ActionManager(scene);
@@ -466,7 +466,7 @@ function BabylonScene7() {
             label4.color = "white";
             guiTexture.addControl(label4);
             label4.linkWithMesh(box4);
-            label4.linkOffsetY = 70.0;
+            label4.linkOffsetY = 150.0;
             label4.fontSize = 42;
             //End of Create Map Icons
 
