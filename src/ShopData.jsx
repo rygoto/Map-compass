@@ -1,6 +1,6 @@
 export const noodleshopdata = [
     { radius: 0.5, angle: 0, shopName: "俺系塩ラーメン", shopDistance: "0.5km" },
-    { radius: 0.2, angle: Math.PI / 2, shopName: "麺の先へ", shopDistance: "0.2km" },
+    { radius: 0.3, angle: Math.PI / 2 + Math.PI / 6, shopName: "麺の先へ", shopDistance: "0.3km" },
     { radius: 0.4, angle: Math.PI, shopName: "Afuri", shopDistance: "0.4km" },
     { radius: 0.8, angle: Math.PI * 3 / 2, shopName: "はやし田", shopDistance: "0.8km" }
 ];
